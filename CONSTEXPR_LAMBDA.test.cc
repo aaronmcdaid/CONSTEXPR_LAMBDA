@@ -36,9 +36,12 @@ int main()
     static_assert(l2(1,2,3) == 3 ,"");
     */
 
-    auto res3 = CONSTEXPR_LAMBDA_with_this_many_args_2(,m)( return m*m;);
-    static_assert(res3(3) == 9 ,"");
+    constexpr auto res3 = CONSTEXPR_LAMBDA_with_this_many_args_2(,m)( return m*m;)(3);
+    static_assert(res3 == 9 ,"");
 
     constexpr auto res4 = CONSTEXPR_LAMBDA_with_this_many_args_4(,a,,b)( return a*b;)(21,3) ;
     static_assert(res4 == 63 ,"");
+
+    constexpr auto res5 = CONSTEXPR_LAMBDA_with_this_many_args_2(,m)( return m*m;) (3);
+    static_assert(res5 == 9 ,"");
 }
