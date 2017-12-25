@@ -55,5 +55,8 @@ int main()
 
         constexpr auto res5 = CONSTEXPR_LAMBDA(,m)( return m*m;) (3);
         static_assert(res5 == 9 ,"");
+
+        constexpr auto res0 = CONSTEXPR_LAMBDA()( return 42;) ();
+        static_assert(res0 == 42 ,"");
     }
 }

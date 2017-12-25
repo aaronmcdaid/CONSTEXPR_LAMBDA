@@ -73,6 +73,14 @@ namespace CONSTEXPR_LAMBDA_namespace
 
 
 // Next are the main macros, one for each number of possible arguments:
+#define CONSTEXPR_LAMBDA_with_this_many_args_1(no_argument_here)                            \
+            CONSTEXPR_LAMBDA_start_of_the_macro_stuff                                       \
+                        ()   {                                                              \
+            CONSTEXPR_LAMBDA_start_the_nested_class                                         \
+            operator()  ()                                                                  \
+            ->decltype(auto)                                                                \
+            {   CONSTEXPR_LAMBDA_BODY_OF_THE_FUNCTION
+
 #define CONSTEXPR_LAMBDA_with_this_many_args_2(REF_OF_ARG0, NAME_OF_ARG0)                   \
             CONSTEXPR_LAMBDA_start_of_the_macro_stuff                                       \
                         (   auto                    REF_OF_ARG0 NAME_OF_ARG0                \
