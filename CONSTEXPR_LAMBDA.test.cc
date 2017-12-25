@@ -60,3 +60,24 @@ int main()
         static_assert(res0 == 42 ,"");
     }
 }
+
+constexpr auto
+foo()
+{
+    int A = 10;
+    int B = 100;
+    int C = 1000;
+    int product = CONSTEXPR_LAMBDA(&,a,,b,,c)
+                    (
+                        int product = a*b*c;
+                        a=2; // 'a' was captured by reference
+                        b=0; // 'b' and 'c' were captured by value,
+                        c=0; // so these assignment don't realy do anything
+                        return product;
+                    )
+                    (A,B,C);
+    // 'product' should be 1000000 now
+    // 'A' was captured by reference, and hence is now 2
+    return A + B + C + product;
+}
+static_assert(foo() == 2 + 100 + 1000 + 1000000 ,"");
