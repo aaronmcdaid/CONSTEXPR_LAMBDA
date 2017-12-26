@@ -62,6 +62,14 @@ test_reference_capture()
 static_assert(test_reference_capture() == 2 + 100 + 1000 + 1000000 ,"");
 ```
 
+## Compatibility
+
+Through testing on gcc.godbolt.org, this works on gcc >= 5.1 and clang >= 3.5. Just remember to use `-std=c++14.
+It also works with the version of `MSVC' currently on gcc.godbolt.org, "MSVC 19 2017 RTW".
+However, I can't get packs to work with MSVC.
+I think this is standard C++14, and if not I think we can fix it if necessary. So don't hesitate to send me any
+improvements!
+
 ## How it works
 To begin, you would write a new class with the appropriate call operator:
 ```

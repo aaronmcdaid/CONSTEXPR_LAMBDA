@@ -91,6 +91,17 @@ int main()
         return (x*) nullptr;
     }));
     static_assert(pseudo_lambda(4) == 16 ,"");
+
+#if 0
+    { // test using packs - they don't work on MSVC
+        constexpr auto i = CONSTEXPR_LAMBDA(...,pack)
+                            (
+                                return sizeof...(pack);
+                            ) (42,"hi");
+        static_assert(i == 2 ,"");
+
+    }
+#endif
 }
 
 constexpr auto
