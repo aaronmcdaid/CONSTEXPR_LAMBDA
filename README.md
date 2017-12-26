@@ -70,6 +70,11 @@ However, I can't get packs to work with MSVC.
 I think this is standard C++14, and if not I think we can fix it if necessary. So don't hesitate to send me any
 improvements!
 
+## Capture lambdas?
+I haven't given any serious thought to how to implement capturing-lambdas here, but I think it should be easy
+enough to do so. However, if you really need such a thing in a particular context, maybe you should just write
+your own class out-of-line!
+
 ## How it works
 To begin, you would write a new class with the appropriate call operator:
 ```
