@@ -94,7 +94,7 @@ int main()
 }
 
 constexpr auto
-foo()
+test_reference_capture()
 {
     int A = 10;
     int B = 100;
@@ -112,4 +112,4 @@ foo()
     // 'A' was captured by reference, and hence is now 2
     return A + B + C + product;
 }
-static_assert(foo() == 2 + 100 + 1000 + 1000000 ,"");
+static_assert(test_reference_capture() == 2 + 100 + 1000 + 1000000 ,"");

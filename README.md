@@ -4,7 +4,8 @@ Simple macro to allow 'constexpr' generic no-capture lambdas in C++14
 *{ Written by [Aaron McDaid](https://aaronmcdaid.github.io/) - aaron.mcdaid@gmail.com }*
 
 In C++14, lambdas are very useful but they have some restrictions. They can't be used in certain contexts and they aren't very friendly with `constexpr`.
-This code works in C++17, but not C++14 (`error: call to non-constexpr function 'main()::<lambda(int)>'`):
+
+For example, the following code works in C++17, but not C++14 (`error: call to non-constexpr function 'main()::<lambda(int)>'`):
 
 ```
     constexpr int a =
@@ -28,7 +29,7 @@ For example:
 CONSTEXPR_LAMBDA(&&,a,&&,b)  ....// capture two args called 'a' and 'b', both of them by forwarding reference
 CONSTEXPR_LAMBDA( &,x,  ,y)  ....// capture two args called 'x' and 'y', 'x' is by reference, 'y' by value
 
-// the above are like:
+// the above are essentially equivalent to:
 
     (auto && a , auto && b)
     (auto  & x , auto    y)
@@ -40,7 +41,7 @@ You can also use `&...` and `&&...` to capture a pack of references or a pack of
 Here is a more complicated demo showing the reference capture:
 ```
 constexpr auto
-foo()
+test_reference_capture()
 {
     int A = 10;
     int B = 100;
@@ -58,7 +59,7 @@ foo()
     // 'A' was captured by reference, and hence is now 2
     return A + B + C + product;
 }
-static_assert(foo() == 2 + 100 + 1000 + 1000000 ,"");
+static_assert(test_reference_capture() == 2 + 100 + 1000 + 1000000 ,"");
 ```
 
 ## How it works
@@ -70,8 +71,11 @@ To begin, you would write a new class with the appropriate call operator:
         { return x * x; }
     };
 ```
-But we want to write this inside another expression. First, we create a lambda which
-return this 'type' indirectly via a pointer. This allows us to write our type anywhere
+But this can't (usually) be written in just any location, for example you can't define new types
+in the middle of expression.
+In order to work around this, and define a new type in the middle of an existing expression,
+we create a lambda which
+returns this `x` 'type' indirectly via a pointer. This allows us to write our type anywhere
 we want: (except in *unevaluated contexts*, for which you should consider my {crazy!} [cambda](https://github.com/aaronmcdaid/cambda) library)
 
 ```
@@ -88,7 +92,8 @@ we want: (except in *unevaluated contexts*, for which you should consider my {cr
     } // define a lambda
     (); // call it, returning the nullptr pointer-to-x
 ```
-But we want a generic function call operator. However, we can't write templates inside these local classes. i.e. this isn't allowed.
+But we want a generic function call operator. This is not yet generic as the argument is fixed to be `int`.
+Unfortunately, we can't write templates inside these local classes. i.e. this isn't allowed.
 ```
     auto * ptr =
     [](){
@@ -121,14 +126,17 @@ But we want a generic function call operator. However, we can't write templates 
 ```
 Now, we can extract an instance of 'x' for the correct argument type:
 ```
-    using x_int     = std::decay_t<decltype(*funny_lambda_returning_our_pseudo_lambda(std::declval<int>()))>;
-    static_assert(std::is_same< int     , decltype(x_int{}(3)) >{} ,"");
-    using x_double  = std::decay_t<decltype(*funny_lambda_returning_our_pseudo_lambda(std::declval<double>()))>;
-    static_assert(std::is_same< double  , decltype(x_double{}(3)) >{} ,"");
+using x_int     = std::decay_t<decltype(*funny_lambda_returning_our_pseudo_lambda(std::declval<int>()))>;
+static_assert(std::is_same< int     , decltype(x_int{}(3)) >{} ,"");
+
+using x_double  = std::decay_t<decltype(*funny_lambda_returning_our_pseudo_lambda(std::declval<double>()))>;
+static_assert(std::is_same< double  , decltype(x_double{}(3)) >{} ,"");
+
 // next, construct and call these two objects. The second one is
 // just to confirm that it truly is the int-to-int version
-    static_assert(2.25 == x_double{} (1.5) ,"");
-    static_assert(1    == x_int   {} (1.5) ,"");
+
+static_assert(2.25 == x_double{} (1.5) ,"");
+static_assert(1    == x_int   {} (1.5) ,"");
 ```
 
 The `call_forwarder` class template automates this for us, generically for any number
@@ -189,7 +197,7 @@ but not:
 ```
     constexpr auto * p1 = null_address_of(3); // error as the entire expression isn't a constant expression
 ```
-We can resolve this with:
+We can resolve this with the "`?:`" trick:
 ```
     constexpr auto * p1 = true ? nullptr : null_address_of(3); // this works
 ```
