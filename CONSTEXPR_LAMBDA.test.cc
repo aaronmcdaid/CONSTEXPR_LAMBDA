@@ -102,6 +102,11 @@ int main()
 
     }
 #endif
+
+    {
+        constexpr auto square = CONSTEXPR_LAMBDA(,a)( return a*a;) ;
+        static_assert(square(4) == 16 ,"");
+    }
 }
 
 constexpr auto

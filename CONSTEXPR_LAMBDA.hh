@@ -18,7 +18,7 @@ namespace CONSTEXPR_LAMBDA_namespace
     {
         template<typename ... T>
         constexpr auto
-        operator() (T && ... t)
+        operator() (T && ... t) const
         ->decltype(auto)
         {
             using X = std::decay_t<decltype( *std::declval<L&>()(std::forward<T>(t)...) )>;
