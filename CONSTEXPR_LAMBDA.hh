@@ -26,6 +26,16 @@ namespace CONSTEXPR_LAMBDA_namespace
             return X{} (std::forward<T>(t)...);
         }
 
+        template<typename ... T>
+        constexpr auto
+        operator() (T && ... t) const volatile
+        ->decltype(auto)
+        {
+            using X = std::decay_t<decltype( *std::declval<L&>()(std::forward<T>(t)...) )>;
+            // X is the nested 'CONSTEXPR_LAMBDA_arbitrary_hidden_struct_namelkdsjflkafdlksafdja' type
+            return X{} (std::forward<T>(t)...);
+        }
+
     };
 
     /* 'make_CONSTEXPR_LAMBDA' constructs a 'call_forwarder' of the appropriate type */
