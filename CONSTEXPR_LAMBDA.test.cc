@@ -59,6 +59,38 @@ int main()
         constexpr auto res0 = CONSTEXPR_LAMBDA()( return 42;) ();
         static_assert(res0 == 42 ,"");
     }
+    auto funny_lambda_returning_our_pseudo_lambda =
+    [](auto outer_x){
+
+        struct x {
+            constexpr auto
+            operator() (decltype(outer_x) x)
+            { return x * x; }
+        };
+        return (x*)nullptr;
+
+    };
+    using x_int     = std::decay_t<decltype(*funny_lambda_returning_our_pseudo_lambda(std::declval<int>()))>;
+    static_assert(std::is_same< int     , decltype(x_int{}(3)) >{} ,"");
+    using x_double  = std::decay_t<decltype(*funny_lambda_returning_our_pseudo_lambda(std::declval<double>()))>;
+    static_assert(std::is_same< double  , decltype(x_double{}(3)) >{} ,"");
+
+    static_assert(2.25 == x_double{} (1.5) ,"");
+    static_assert(1    == x_int   {} (1.5) ,"");
+
+    auto pseudo_lambda = CONSTEXPR_LAMBDA_namespace::make_CONSTEXPR_LAMBDA(true ? nullptr : CONSTEXPR_LAMBDA_namespace::null_address_of([](auto && arg0) {
+        struct x
+        {
+            constexpr auto
+            operator() (decltype(arg0)&& arg0)
+            ->decltype(auto)
+            {
+                return arg0*arg0;
+            }
+        };
+        return (x*) nullptr;
+    }));
+    static_assert(pseudo_lambda(4) == 16 ,"");
 }
 
 constexpr auto
